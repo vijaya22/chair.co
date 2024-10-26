@@ -4,7 +4,7 @@ import ColorPickerComponent from "./components/color-picker-component"
 function App() {
   return (
     <>
-      <ColorPickerComponent />
+      {/* <ColorPickerComponent /> */}
     </>
   );
 }

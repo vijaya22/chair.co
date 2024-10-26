@@ -11,13 +11,13 @@
   "content_scripts": [
     {
       "js": ["main.js"],
-      "matches": ["*://*.google.com/*"]
+      "matches": ["<all_urls>"]
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["*"],
-      "matches": ["*://*.google.com/*"]
+      "resources": ["assest/svg/eyedropper.png"],
+      "matches":  ["<all_urls>"]
     }
   ]
 }
