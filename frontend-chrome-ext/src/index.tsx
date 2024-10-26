@@ -13,6 +13,6 @@ rootDiv.render(
   </React.StrictMode>
 );
 
-// reportWebVitals();
+reportWebVitals();
 
 

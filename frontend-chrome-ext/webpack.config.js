@@ -5,7 +5,8 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 module.exports = {
     entry: {
-        main: "./src/index.tsx",  // Explicitly name entry point as 'main'
+        main: "./src/main.tsx",  // Explicitly name entry point as 'main'
+        popup: "./src/index.tsx", 
     },
     mode: "production",  // Use development mode for predictable output
     devtool: 'source-map',
@@ -29,7 +30,6 @@ module.exports = {
                     "style-loader",
                     "css-loader",
                 ],
-                exclude: /node_modules/,
             },
         ],
     },
@@ -41,10 +41,10 @@ module.exports = {
             ],
         }),
         new HTMLPlugin({
-            title: "React Extension",
+            title: "Popup",
             filename: "index.html",
-            chunks: ["main"],
-        }),
+            chunks: ["popup"],  // Only include the popup chunk here
+        })
     ],
     resolve: {
         extensions: [".tsx", ".ts", ".js"],

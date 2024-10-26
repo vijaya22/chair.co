@@ -1,15 +1,12 @@
 import React from 'react';
+import ColorPickerComponent from "./components/color-picker-component"
 
 function App() {
   return (
-    <div className="App">
-      Hello World
-    </div>
+    <>
+      <ColorPickerComponent />
+    </>
   );
 }
-
-// const App: React.FC = () => {  // React.FC defines App as a functional component
-//   return <div>Hello, Color Picker!</div>;
-// };
 
 export default App;
