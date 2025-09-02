@@ -247,6 +247,7 @@ export default function ColorPickerLauncher() {
   }
 
   const swatchColor = useMemo(() => pickedColor || previewColor, [pickedColor, previewColor]);
+  const swatchLabel = useMemo(() => (pickedColor ? 'Picked' : (previewColor ? 'Preview' : '')), [pickedColor, previewColor]);
 
   return (
     <div ref={containerRef} style={{ position: "fixed", top: pos.y, left: pos.x, zIndex: 2147483647 }}>
@@ -254,7 +255,7 @@ export default function ColorPickerLauncher() {
         ref={btnRef}
         type="button"
         aria-label={open ? "Close color picker" : "Open color picker"}
-        title={swatchColor ? `Color ${swatchColor}` : undefined}
+        title={swatchColor ? `${swatchLabel} color ${swatchColor}` : undefined}
         onClick={() => setOpen((v) => !v)}
         onMouseDown={startDrag}
         onMouseUp={endPress}
@@ -292,8 +293,8 @@ export default function ColorPickerLauncher() {
             boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
             background: swatchColor,
           }}
-          title={swatchColor}
-          aria-label={swatchColor}
+          title={`${swatchLabel} ${swatchColor}`}
+          aria-label={`${swatchLabel} ${swatchColor}`}
         />
       )}
 
@@ -328,6 +329,7 @@ export default function ColorPickerLauncher() {
             {swatchColor && (
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                 <div style={{ width: 16, height: 16, border: '1px solid #e5e7eb', borderRadius: 3, background: swatchColor }} />
+                <span style={{ fontSize: 12, color: '#6b7280' }}>{swatchLabel}:</span>
                 <span style={{ fontFamily: 'monospace', fontSize: 12 }}>{swatchColor}</span>
               </div>
             )}
