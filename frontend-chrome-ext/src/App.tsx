@@ -1,10 +1,10 @@
 import React from 'react';
-import ColorPickerComponent from "./components/color-picker-component"
+import ColorPickerLauncher from "./components/color-picker-launcher";
 
 function App() {
   return (
     <>
-      <ColorPickerComponent />
+      <ColorPickerLauncher />
     </>
   );
 }
