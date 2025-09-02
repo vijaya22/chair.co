@@ -8,13 +8,16 @@ function init() {
   console.log("hi its me:::")
   const root = document.createElement("div");
   root.className = "container-color-picker";
-  root.style.width = "10px";
-  root.style.height = "10px";
   root.style.position = "fixed";
-  root.style.border = "solid 1px red";
-  root.style.bottom = "50px";
-  root.style.right = "50px";
-  root.style.backgroundColor = "red";
+  root.style.bottom = "24px";
+  root.style.right = "24px";
+  root.style.width = "320px";
+  root.style.maxWidth = "90vw";
+  root.style.padding = "8px";
+  root.style.border = "1px solid #d1d5db"; // gray-300
+  root.style.borderRadius = "8px";
+  root.style.backgroundColor = "#fff";
+  root.style.boxShadow = "0 8px 24px rgba(0,0,0,0.12)";
   root.style.zIndex = "9999";
 
   // width: 10px;
