@@ -19,20 +19,24 @@ Enable the bottom-right launcher icon to report the color of the page pixel unde
 - Service Worker (SW): Performs capture and returns data URL.
 - Messaging: CS → SW `{type:"CAPTURE"}`; SW → CS `{type:"CAPTURE_RESULT", dataUrl}`.
 
-## Manifest & Permissions
-- Add background and tabs permission:
+## Permission Strategy (No "tabs")
+- Recommended: use only `"activeTab"` (no `"tabs"`).
+- Rationale: `activeTab` grants temporary access to the active tab after a user gesture on the extension (e.g., clicking the toolbar icon or using a keyboard shortcut). `chrome.tabs.captureVisibleTab` works under this grant.
+- Manifest additions:
 ```json
 {
   "manifest_version": 3,
-  "permissions": ["activeTab", "tabs"],
+  "permissions": ["activeTab"],
+  "action": { "default_popup": "index.html", "default_title": "chair.co" },
   "background": { "service_worker": "background.js" }
 }
 ```
+Note: keep the content script as-is. The user must click the extension action once per tab to “arm” sampling.
 
 ## Data Flow
 1) CS hides overlay (`visibility: hidden`), waits a frame.
 2) CS sends `CAPTURE` to SW.
-3) SW calls `chrome.tabs.captureVisibleTab({ format: "png" })` and replies with data URL.
+3) SW calls `chrome.tabs.captureVisibleTab({ format: "png" })` and replies with data URL. If `Permission denied`, return `NO_ACTIVE_TAB_ACCESS` and prompt the user to click the toolbar icon.
 4) CS draws image to canvas; computes center → DPR-scaled `(x,y)` → `getImageData`.
 5) CS restores overlay; updates swatch/tooltip and state.
 
@@ -53,12 +57,13 @@ Enable the bottom-right launcher icon to report the color of the page pixel unde
 - Request minimal permissions; document behavior in README.
 
 ## Implementation Checklist
-- [ ] Manifest: add `"tabs"` permission and background service worker.
+- [ ] Manifest: add `"activeTab"`, `background.service_worker`, and ensure an `action` is present for user activation (no `"tabs"`).
 - [ ] Build: add `background: "./src/background.ts"` entry in `webpack.config.js` → output `background.js`.
 - [ ] SW: implement `background.ts` listener for `chrome.runtime.onMessage` `CAPTURE` → `captureVisibleTab` → respond with data URL.
 - [ ] CS: add sampling util in launcher component:
   - [ ] Hide overlay, `await next animation frame`.
   - [ ] Send `CAPTURE`; handle timeout/error.
+  - [ ] If error `NO_ACTIVE_TAB_ACCESS`, show inline nudge: “Click the extension icon to enable sampling on this tab,” and optionally open the popup programmatically via instructions.
   - [ ] Draw image to offscreen canvas; sample pixel; convert to hex/RGB.
   - [ ] Restore overlay; update swatch tooltip and internal color state.
   - [ ] During drag: throttle sample loop; cancel on mouseup/touchend.
@@ -66,6 +71,10 @@ Enable the bottom-right launcher icon to report the color of the page pixel unde
 - [ ] Fallback: on failure, try `EyeDropper` API when user explicitly clicks “Pick from screen” (if available).
 - [ ] Tests: unit-test mapping helper; manual runbook for zoom/DPI; verify panel still opens and works.
 - [ ] Docs: update README with permission rationale and how sampling works.
+
+## Limitations Without "tabs"
+- Requires a user gesture on the extension (toolbar button or command) to grant `activeTab` before sampling; content script clicks alone do not grant it.
+- Grant resets on navigation. Keep UX nudge minimal and clear.
 
 ## Acceptance Criteria
 - [ ] Clicking the icon samples and shows the correct color swatch.
