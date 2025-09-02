@@ -24,6 +24,7 @@ export default function ColorPickerLauncher() {
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const btnRef = useRef<HTMLButtonElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   // Draggable position (fixed coordinates)
   const [pos, setPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -195,19 +196,37 @@ export default function ColorPickerLauncher() {
     return best?.hex ?? null;
   }
 
+  function getPageElementAtPoint(x: number, y: number): HTMLElement | null {
+    const list = (document.elementsFromPoint(x, y) || []) as Element[];
+    for (const el of list) {
+      if (!(el instanceof HTMLElement)) continue;
+      if (containerRef.current && containerRef.current.contains(el)) continue; // skip our overlay
+      return el;
+    }
+    return null;
+  }
+
   function getElementColorAtPoint(x: number, y: number): string | null {
-    const el = document.elementFromPoint(x, y) as HTMLElement | null;
+    let el: HTMLElement | null = getPageElementAtPoint(x, y);
     if (!el) return null;
-    const cs = getComputedStyle(el);
-    const candidates = [
-      cs.backgroundColor,
-      cs.color,
-      cs.borderTopColor,
-      cs.borderRightColor,
-      cs.borderBottomColor,
-      cs.borderLeftColor,
-    ];
-    return pickMostOpaque(candidates);
+    // Walk up ancestors until we find a non-transparent color candidate
+    let depth = 0;
+    while (el && depth < 6) {
+      const cs = getComputedStyle(el);
+      const candidates = [
+        cs.backgroundColor,
+        cs.color,
+        cs.borderTopColor,
+        cs.borderRightColor,
+        cs.borderBottomColor,
+        cs.borderLeftColor,
+      ];
+      const chosen = pickMostOpaque(candidates);
+      if (chosen) return chosen;
+      el = el.parentElement;
+      depth += 1;
+    }
+    return null;
   }
 
   async function openEyeDropper() {
@@ -230,7 +249,7 @@ export default function ColorPickerLauncher() {
   const swatchColor = useMemo(() => pickedColor || previewColor, [pickedColor, previewColor]);
 
   return (
-    <div style={{ position: "fixed", top: pos.y, left: pos.x, zIndex: 2147483647 }}>
+    <div ref={containerRef} style={{ position: "fixed", top: pos.y, left: pos.x, zIndex: 2147483647 }}>
       <button
         ref={btnRef}
         type="button"
