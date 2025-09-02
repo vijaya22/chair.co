@@ -44,3 +44,10 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+## Color Picker Launcher
+
+- The extension injects a small, draggable eyedropper icon at the bottom right of pages.
+- While dragging, it shows a preview swatch based on the element under the icon.
+- Click the icon to open the panel. Use "Pick from screen" for an accurate color using the EyeDropper API.
+- Some pages like chrome:// do not allow picking; the button is disabled there.
