@@ -30,10 +30,9 @@ Enable the bottom-right launcher icon to report the color of the page pixel unde
 Note: `activeTab` is optional here; keep it only if other features need it. The color picking itself does not require it.
 
 ## Data Flow
-1) CS hides overlay (`visibility: hidden`), waits a frame.
-2) CS sends `CAPTURE` to SW.
-3) On user click of “Pick” (e.g., clicking the launcher or a dedicated button), CS calls `new EyeDropper().showPicker()`.
-4) Resolve color (sRGB hex) and update swatch/tooltip and internal state. If unsupported or user cancels, show a subtle message.
+1) While dragging, compute the icon center and derive a heuristic preview color for instant feedback.
+2) On user click of Pick, call `new EyeDropper().showPicker()`.
+3) Resolve color and update swatch and state. On cancel or unsupported, show a subtle message.
 
 ## Heuristic Coordinate Mapping (for previews)
 - `centerX = btnRect.left + btnRect.width/2`
@@ -49,7 +48,7 @@ Note: `activeTab` is optional here; keep it only if other features need it. The 
 ## Privacy
 - Only capture current tab on demand; do not persist images.
 - Request minimal permissions; document behavior in README.
-
+## Implementation Checklist
 - [ ] Manifest: keep minimal permissions (no `tabs`).
 - [ ] CS: add heuristic preview under icon using `elementFromPoint` + computed styles (document limitations in code comment).
 - [ ] CS: add accurate picker button/handler using `EyeDropper().showPicker()`; update state with resolved color; handle cancel/unsupported.
@@ -58,6 +57,15 @@ Note: `activeTab` is optional here; keep it only if other features need it. The 
 - [ ] Fallback: if `EyeDropper` unsupported, show helper text and keep heuristic-only mode.
 - [ ] Tests: unit-test mapping helper; manual runbook for zoom/DPI; verify panel still opens and works.
 - [ ] Docs: update README with permission rationale and how sampling works.
+
+### Implementation Tasks
+- [ ] Add state to `color-picker-launcher.tsx` for `previewColor` and `pickedColor`.
+- [ ] Implement `getElementColorAtPoint(x, y)` using `document.elementFromPoint` and `getComputedStyle` to select the most opaque non transparent color from background, text, and borders.
+- [ ] Add a throttled loop during drag to update `previewColor` at about 10 to 20 Hz using `requestAnimationFrame` timestamps.
+- [ ] Render a small swatch badge near the icon showing `previewColor` or `pickedColor` when available, with accessible labels.
+- [ ] Add a button or long press action to invoke `new EyeDropper().showPicker()` and set `pickedColor` on resolve; handle cancel and unsupported.
+- [ ] Add a small utility to format colors to hex and rgba strings for display and copy.
+- [ ] Add simple unit tests for color parsing and selection helpers if test setup allows; otherwise include manual test steps.
 
 ## Limitations Without "tabs"
 - Requires a user gesture on the extension (toolbar button or command) to grant `activeTab` before sampling; content script clicks alone do not grant it.
